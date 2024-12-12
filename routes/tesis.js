@@ -62,6 +62,6 @@ router.get('/tesis/:id', tesisController.getTesisById);
 router.get('/tesis/user/:userId', tesisController.getTesisByUserId);
 
 router.get('/tesis/anexo11/:tesisId', tesisController.getAnexo11Documents);
-router.get('/tesis/download/:fileName', tesisController.downloadFile);
+router.get('/tesis/download/:tesisId/:fileKey', tesisController.downloadFile);
 
 module.exports = router;

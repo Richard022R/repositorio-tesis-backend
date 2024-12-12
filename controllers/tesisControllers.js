@@ -194,8 +194,6 @@ exports.getAnexo11Documents = async (req, res) => {
   try {
     const { tesisId } = req.params;
 
-    console.log('Received tesisId:', tesisId); // Agrega esto para debuggear
-
     const tesis = await Tesis.findById(tesisId);
 
     if (!tesis) {
