@@ -1,3 +1,4 @@
+const req = require('express/lib/request');
 const mongoose = require('mongoose');
 
 const TesisSchema = new mongoose.Schema({
@@ -8,11 +9,15 @@ const TesisSchema = new mongoose.Schema({
   },
   anexo11: {
     informeComiteEtica: {
+      type: Object,
+      required: true,
       fileName: { type: String},
       fileUrl: { type: String},
       uploadDate: { type: Date}
     },
     dictamenAprobacionProyecto: {
+      type: Object,
+      required: true,
       fileName: { type: String},
       fileUrl: { type: String},
       uploadDate: { type: Date}
@@ -20,26 +25,129 @@ const TesisSchema = new mongoose.Schema({
   },
   anexo30: {
     constanciaOriginalidad: {
+      type: Object,
+      required: false,
       fileName: { type: String },
       fileUrl: { type: String },
-      uploadDate: { type: Date }
+      uploadDate: { type: Date },
     },
     codigoActaSustentacion: {
+      type: Object,
+      required: false,
       fileName: { type: String },
       fileUrl: { type: String },
       uploadDate: { type: Date }
     },
     codigoReporteSimilitudCarta: {
+      type: Object,
+      required: false,
       fileName: { type: String },
       fileUrl: { type: String },
       uploadDate: { type: Date }
     },
     reciboTurnitin: {
+      type: Object,
+      required: false,
       fileName: { type: String },
       fileUrl: { type: String },
       uploadDate: { type: Date }
     },
     reporteSimilitud: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    }
+  },
+  extras: {
+    constanciaAmnistia: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    expedito: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    certificadoDeNoAdeudo: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    constanciaDeSolvencia: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    contanciaDeMatriculaEgreso: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    cartaCompromiso: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    cartaRenuncia: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    codigoResolucionJuradosFacu: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    codigoResolucionJuradosInfo: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    nExpedienteResolucionJuados: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    codigoResolucionAsesorFacu: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    codigoResolucionAsesorInfo: {
+      type: Object,
+      required: false,
+      fileName: { type: String },
+      fileUrl: { type: String },
+      uploadDate: { type: Date }
+    },
+    envioDeResolucionesAsesor: {
+      type: Object,
+      required: false,
       fileName: { type: String },
       fileUrl: { type: String },
       uploadDate: { type: Date }

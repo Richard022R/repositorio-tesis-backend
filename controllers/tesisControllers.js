@@ -1,20 +1,4 @@
 const Tesis = require('../models/Tesis');
-const path = require('path');
-
-// Configuración de multer para la subida de archivos
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Carpeta donde se guardan los archivos
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
-
-const upload = multer({ storage });
 
 // Crear nueva tesis con documentos de anexo 11
 exports.createTesis = async (req, res) => {
@@ -99,6 +83,63 @@ exports.addAnexo30 = async (req, res) => {
   }
 };
 
+// subir documentos al extras
+exports.addExtras = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const tesis = await Tesis.findById(id);
+
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    // Actualizar los documentos de extras
+    const extrasFiles = {};
+    if (req.files) {
+      Object.keys(req.files).forEach((key) => {
+        extrasFiles[key] = {
+          fileName: req.files[key][0].originalname,
+          fileUrl: req.files[key][0].path,
+          uploadDate: new Date()
+        };
+      });
+    }
+
+    tesis.extras = { ...tesis.extras, ...extrasFiles };
+    const updatedTesis = await tesis.save();
+
+    res.status(200).json({
+      message: 'Documentos de extras añadidos exitosamente.',
+      data: updatedTesis
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al añadir documentos de extras.', error });
+  }
+};
+
+// obtener tesis por id de usuario
+exports.getTesisByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const tesis = await Tesis.findOne({ userId });
+
+    if (!tesis) { 
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    res.status(200).json({
+      message: 'Tesis encontrada.',
+      data: tesis
+    });
+  } catch (error) { 
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener la tesis.', error });
+  }
+};
+
 // Obtener tesis por ID
 exports.getTesisById = async (req, res) => {
   try {
@@ -120,4 +161,53 @@ exports.getTesisById = async (req, res) => {
   }
 };
 
-// Puedes subir extras y vincularlos a la tesis
+// descargar documento de tesis
+exports.downloadFile = async (req, res) => {
+  try {
+    const { tesisId, fileKey } = req.params;
+
+    const tesis = await Tesis.findById(tesisId);
+
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    if (!tesis.anexo11 || !tesis.anexo30 || !tesis.extras) {
+      return res.status(404).json({ message: 'No se encontraron archivos para descargar.' });
+    }
+
+    const file = tesis.anexo11[fileKey] || tesis.anexo30[fileKey] || tesis.extras[fileKey];
+
+    if (!file) {
+      return res.status(404).json({ message: 'Archivo no encontrado.' });
+    }
+
+    res.download(file.fileUrl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al descargar el archivo.', error });
+  }
+};
+
+// obtener los documentos de la tesis en anexo 11
+exports.getAnexo11Documents = async (req, res) => {
+  try {
+    const { tesisId } = req.params;
+
+    console.log('Received tesisId:', tesisId); // Agrega esto para debuggear
+
+    const tesis = await Tesis.findById(tesisId);
+
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    res.status(200).json({
+      message: 'Documentos de Anexo 11 obtenidos.',
+      data: tesis.anexo11 || {}
+    });
+  } catch (error) {
+    console.error('Error in getAnexo11Documents:', error);
+    res.status(500).json({ message: 'Error al obtener los documentos.', error: error.message });
+  }
+};
