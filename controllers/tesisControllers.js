@@ -1,4 +1,7 @@
+const { get } = require('mongoose');
 const Tesis = require('../models/Tesis');
+const User = require('../models/User');
+
 
 // Crear nueva tesis con documentos de anexo 11
 exports.createTesis = async (req, res) => {
@@ -207,5 +210,58 @@ exports.getAnexo11Documents = async (req, res) => {
   } catch (error) {
     console.error('Error in getAnexo11Documents:', error);
     res.status(500).json({ message: 'Error al obtener los documentos.', error: error.message });
+  }
+};
+
+// obtener todos los documentos de un usuario
+exports.getUserDocuments = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
+    const tesis = await Tesis.findOne({ userId });
+    console.log(tesis);
+    if (!tesis) { 
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    res.status(200).json({
+      message: 'Documentos de usuario obtenidos.',
+      data: {tesis, user}
+    });
+  }
+  catch (error) {
+    console.error('Error in getUserDocuments:', error);
+    res.status(500).json({ message: 'Error al obtener los documentos.', error: error.message });
+  }
+};
+
+// actualizar el status de la tesis
+exports.updateTesisStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    const tesis = await Tesis.findById(id);
+
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    tesis.status = estado;
+    const updatedTesis = await tesis.save();
+
+    res.status(200).json({
+      message: 'Estado de la tesis actualizado.',
+      data: updatedTesis
+    });
+  } catch (error) {
+    console.error('Error in updateTesisStatus:', error);
+    res.status(500).json({ message: 'Error al actualizar el estado de la tesis.', error: error.message });
   }
 };

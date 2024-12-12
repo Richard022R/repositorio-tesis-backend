@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserSchema = require('../models/User');
+const Tesis = require('../models/Tesis');
 
 // Registro de usuario (con hash de contraseña)
 const register = async (req, res, next) => {
@@ -75,11 +76,28 @@ const getUsers = async (req, res, next) => {
   }
 };
 
+// elimitar usuario por id y su tesis
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await UserSchema.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+    }
+    await Tesis.deleteOne({ userId: id });
+    await UserSchema.deleteOne({ _id: id });
+    res.status(200).json({ success: true, message: 'Usuario eliminado' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 // Funciones adicionales (como getUser, updateUser, etc.) deben ser definidas también si las necesitas.
 
 module.exports = {
   register,
   login,
   getUsers,
+  deleteUser,
   // Otras funciones que puedas tener
 };
