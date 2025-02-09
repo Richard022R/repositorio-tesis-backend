@@ -8,34 +8,73 @@ exports.createTesis = async (req, res) => {
   try {
     const { userId } = req.body;
 
-    if (!req.files || !req.files['informeComiteEtica'] || !req.files['dictamenAprobacionProyecto']) {
+    // Validar datos de entrada
+    if (!userId) {
+      return res.status(400).json({ message: 'El campo userId es obligatorio.' });
+    }
+
+    if (
+      !req.files || 
+      !req.files['informeComiteEtica'] || 
+      !req.files['dictamenAprobacionProyecto']
+    ) {
       return res.status(400).json({
-        message: 'Debe incluir los documentos obligatorios del anexo 11: informe del comité de ética y dictamen de aprobación del proyecto.'
+        message: 'Debe incluir los documentos obligatorios del anexo 11: informe del comité de ética y dictamen de aprobación del proyecto.',
       });
     }
 
+    // Buscar usuario
+    const userFind = await User.findById(userId);
+    if (!userFind) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
+    // Crear nueva tesis
     const newTesis = new Tesis({
       userId,
       anexo11: {
         informeComiteEtica: {
           fileName: req.files['informeComiteEtica'][0].originalname,
           fileUrl: req.files['informeComiteEtica'][0].path,
-          uploadDate: new Date()
+          uploadDate: new Date(),
         },
         dictamenAprobacionProyecto: {
           fileName: req.files['dictamenAprobacionProyecto'][0].originalname,
           fileUrl: req.files['dictamenAprobacionProyecto'][0].path,
-          uploadDate: new Date()
-        }
+          uploadDate: new Date(),
+        },
       },
       createdAt: new Date(),
       estado: 'En Proceso',
     });
 
+    // Actualizar estado del usuario
+    userFind.status = 1;
+    await userFind.save();
+
+    // Preparar respuesta del usuario
+    const userResponse = {
+      birthdate: userFind.birthdate,
+      code: userFind.code,
+      documentNumber: userFind.documentNumber,
+      email: userFind.email,
+      fatherLastName: userFind.fatherLastName,
+      genre: userFind.genre,
+      motherLastName: userFind.motherLastName,
+      name: userFind.name,
+      status: userFind.status,
+      typeTesis: userFind.typeTesis,
+      userId: userFind._id,
+    };
+
+    // Guardar tesis
     const savedTesis = await newTesis.save();
+
+    // Respuesta exitosa
     res.status(201).json({
       message: 'Tesis creada exitosamente con documentos de anexo 11.',
-      data: savedTesis
+      data: savedTesis,
+      user: userResponse,
     });
   } catch (error) {
     console.error(error);

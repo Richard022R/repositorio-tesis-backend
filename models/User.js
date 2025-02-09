@@ -44,16 +44,12 @@ const UserSchema = new mongoose.Schema(
       required: [true, 'Please provide a typeTesis'],
       enum: ['Tesis', 'Suficiencia'], // Solo permite estos valores
     },
-    role: {
-      type: String,
-      enum: ['user', 'admin','professor'],
-      default: 'user',
-    },
     status: {
-      type: String,
-      enum: ['active', 'inactive'],
-      default: 'active',
+      type: Number,
+      enum: [0, 1, 2],
+      default: 0,
     },
+
   },
   {
     timestamps: true,

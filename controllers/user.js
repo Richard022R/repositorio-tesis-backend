@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserSchema = require('../models/User');
 const Tesis = require('../models/Tesis');
+const verifyToken = require('../middlewares/jwt');
 
 // Registro de usuario (con hash de contraseña)
 const register = async (req, res, next) => {
@@ -47,18 +48,32 @@ const login = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
-
+    const response = {
+      "birthdate": user.birthdate,
+      "code": user.code,
+      "documentNumber": user.documentNumber,
+      "email": user.email,
+      "fatherLastName": user.fatherLastName,
+      "genre": user.genre,
+      "motherLastName": user.motherLastName,
+      "name": user.name,
+      "status": user.status,
+      "typeTesis": user.typeTesis,
+      "userId": user._id,
+    }
     console.log("Token generado:", token);
-    res.status(200).json({ success: true, token, user });
+    res.status(200).json({ success: true, token, user: response });
   } catch (error) {
     console.error("Error en el login:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+
 
 // Obtener todos los usuarios
 const getUsers = async (req, res, next) => {
@@ -91,6 +106,7 @@ const deleteUser = async (req, res, next) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 // Funciones adicionales (como getUser, updateUser, etc.) deben ser definidas también si las necesitas.
 
