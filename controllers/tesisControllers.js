@@ -225,6 +225,7 @@ exports.downloadFile = async (req, res) => {
     }
 
     res.download(file.fileUrl);
+    console.log(file.fileUrl);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al descargar el archivo.', error });
