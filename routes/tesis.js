@@ -70,4 +70,53 @@ router.get('/users/:userId/files', tesisController.getUserDocuments);
 
 router.put('/tesis/:id', tesisController.updateTesisStatus);
 
+// Nuevas rutas para actualizar documentos
+router.put(
+  '/tesis/:id/anexo11/update',
+  upload.fields([
+    { name: 'informeComiteEtica', maxCount: 1 },
+    { name: 'dictamenAprobacionProyecto', maxCount: 1 }
+  ]),
+  tesisController.updateAnexo11
+);
+
+router.put(
+  '/tesis/:id/anexo30/update',
+  upload.fields([
+    { name: 'constanciaOriginalidad', maxCount: 1 },
+    { name: 'codigoActaSustentacion', maxCount: 1 },
+    { name: 'codigoReporteSimilitudCarta', maxCount: 1 },
+    { name: 'reciboTurnitin', maxCount: 1 },
+    { name: 'reporteSimilitud', maxCount: 1 }
+  ]),
+  tesisController.updateAnexo30
+);
+
+router.put(
+  '/tesis/:id/extras/update',
+  upload.fields([
+    { name: 'constanciaAmnistia', maxCount: 1 },
+    { name: 'expedito', maxCount: 1 },
+    { name: 'certificadoDeNoAdeudo', maxCount: 1 },
+    { name: 'constanciaDeSolvencia', maxCount: 1 },
+    { name: 'contanciaDeMatriculaEgreso', maxCount: 1 },
+    { name: 'cartaCompromiso', maxCount: 1 },
+    { name: 'cartaRenuncia', maxCount: 1 },
+    { name: 'codigoResolucionJuradosFacu', maxCount: 1 },
+    { name: 'codigoResolucionJuradosInfo', maxCount: 1 },
+    { name: 'nExpedienteResolucionJuados', maxCount: 1 },
+    { name: 'codigoResolucionAsesorFacu', maxCount: 1 },
+    { name: 'codigoResolucionAsesorInfo', maxCount: 1 },
+    { name: 'envioDeResolucionesAsesor', maxCount: 1 }
+  ]),
+  tesisController.updateExtras
+);
+
+// Ruta genérica para actualizar cualquier documento
+router.put(
+  '/tesis/:id/:documentType/:documentKey/update',
+  upload.single('documento'),
+  tesisController.updateDocument
+);
+
 module.exports = router;

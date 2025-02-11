@@ -292,7 +292,7 @@ exports.updateTesisStatus = async (req, res) => {
       return res.status(404).json({ message: 'Tesis no encontrada.' });
     }
 
-    tesis.status = estado;
+    tesis.estado = estado;
     const updatedTesis = await tesis.save();
 
     res.status(200).json({
@@ -304,46 +304,188 @@ exports.updateTesisStatus = async (req, res) => {
     res.status(500).json({ message: 'Error al actualizar el estado de la tesis.', error: error.message });
   }
 };
-exports.getAnexo30Documents = async (req, res) => {
-    try {
-      const { tesisId } = req.params;
-  
-      console.log('Received tesisId:', tesisId); // Agrega esto para debuggear
-  
-      const tesis = await Tesis.findById(tesisId);
-  
-      if (!tesis) {
-        return res.status(404).json({ message: 'Tesis no encontrada.' });
-      }
-  
-      res.status(200).json({
-        message: 'Documentos de Anexo 11 obtenidos.',
-        data: tesis.anexo30 || {}
-      });
-    } catch (error) {
-      console.error('Error in getAnexo11Documents:', error);
-      res.status(500).json({ message: 'Error al obtener los documentos.', error: error.message });
-    }
-  };
 
-  exports.getExtrasDocuments = async (req, res) => {
-    try {
-      const { tesisId } = req.params;
-  
-      console.log('Received tesisId:', tesisId); // Agrega esto para debuggear
-  
-      const tesis = await Tesis.findById(tesisId);
-  
-      if (!tesis) {
-        return res.status(404).json({ message: 'Tesis no encontrada.' });
-      }
-  
-      res.status(200).json({
-        message: 'Documentos de Anexo 11 obtenidos.',
-        data: tesis.extras || {}
-      });
-    } catch (error) {
-      console.error('Error in getAnexo11Documents:', error);
-      res.status(500).json({ message: 'Error al obtener los documentos.', error: error.message });
+exports.getAnexo30Documents = async (req, res) => {
+  try {
+    const { tesisId } = req.params;
+
+    const tesis = await Tesis.findById(tesisId);
+
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
     }
-  };
+
+    res.status(200).json({
+      message: 'Documentos de Anexo 30 obtenidos.',
+      data: tesis.anexo30 || {}
+    });
+  } catch (error) {
+    console.error('Error in getAnexo30Documents:', error);
+    res.status(500).json({ message: 'Error al obtener los documentos.', error: error.message });
+  }
+};
+
+exports.getExtrasDocuments = async (req, res) => {
+  try {
+    const { tesisId } = req.params;
+
+    const tesis = await Tesis.findById(tesisId);
+
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    res.status(200).json({
+      message: 'Documentos Extras obtenidos.',
+      data: tesis.extras || {}
+    });
+  } catch (error) {
+    console.error('Error in getExtrasDocuments:', error);
+    res.status(500).json({ message: 'Error al obtener los documentos.', error: error.message });
+  }
+};
+
+// Actualizar documentos del Anexo 11
+exports.updateAnexo11 = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const tesis = await Tesis.findById(id);
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    // Actualizar solo los documentos que se enviaron
+    if (req.files) {
+      Object.keys(req.files).forEach((key) => {
+        tesis.anexo11[key] = {
+          fileName: req.files[key][0].originalname,
+          fileUrl: req.files[key][0].path,
+          uploadDate: new Date()
+        };
+      });
+    }
+
+    const updatedTesis = await tesis.save();
+
+    res.status(200).json({
+      message: 'Documentos del anexo 11 actualizados exitosamente.',
+      data: updatedTesis
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar documentos del anexo 11.', error });
+  }
+};
+
+// Actualizar documentos específicos del Anexo 30
+exports.updateAnexo30 = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const tesis = await Tesis.findById(id);
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    // Verificar si existe el anexo 11 antes de actualizar el 30
+    if (!tesis.anexo11 || !tesis.anexo11.informeComiteEtica || !tesis.anexo11.dictamenAprobacionProyecto) {
+      return res.status(400).json({
+        message: 'Debe completar primero los documentos del anexo 11.'
+      });
+    }
+
+    // Actualizar solo los documentos que se enviaron
+    if (req.files) {
+      Object.keys(req.files).forEach((key) => {
+        tesis.anexo30[key] = {
+          fileName: req.files[key][0].originalname,
+          fileUrl: req.files[key][0].path,
+          uploadDate: new Date()
+        };
+      });
+    }
+
+    const updatedTesis = await tesis.save();
+
+    res.status(200).json({
+      message: 'Documentos del anexo 30 actualizados exitosamente.',
+      data: updatedTesis
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar documentos del anexo 30.', error });
+  }
+};
+
+// Actualizar documentos extras
+exports.updateExtras = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const tesis = await Tesis.findById(id);
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    // Actualizar solo los documentos que se enviaron
+    if (req.files) {
+      Object.keys(req.files).forEach((key) => {
+        tesis.extras[key] = {
+          fileName: req.files[key][0].originalname,
+          fileUrl: req.files[key][0].path,
+          uploadDate: new Date()
+        };
+      });
+    }
+
+    const updatedTesis = await tesis.save();
+
+    res.status(200).json({
+      message: 'Documentos extras actualizados exitosamente.',
+      data: updatedTesis
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar documentos extras.', error });
+  }
+};
+
+// Función genérica para actualizar cualquier documento
+exports.updateDocument = async (req, res) => {
+  try {
+    const { id, documentType, documentKey } = req.params;
+    
+    const tesis = await Tesis.findById(id);
+    if (!tesis) {
+      return res.status(404).json({ message: 'Tesis no encontrada.' });
+    }
+
+    // Validar que el tipo de documento existe
+    if (!['anexo11', 'anexo30', 'extras'].includes(documentType)) {
+      return res.status(400).json({ message: 'Tipo de documento no válido.' });
+    }
+
+    // Validar que existe el archivo
+    if (!req.files || !req.files[documentKey]) {
+      return res.status(400).json({ message: 'No se ha proporcionado ningún archivo.' });
+    }
+
+    // Actualizar el documento específico
+    tesis[documentType][documentKey] = {
+      fileName: req.files[documentKey][0].originalname,
+      fileUrl: req.files[documentKey][0].path,
+      uploadDate: new Date()
+    };
+
+    const updatedTesis = await tesis.save();
+
+    res.status(200).json({
+      message: `Documento ${documentKey} actualizado exitosamente.`,
+      data: updatedTesis
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar el documento.', error });
+  }
+};
