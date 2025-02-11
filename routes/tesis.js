@@ -57,13 +57,15 @@ router.put(
   tesisController.addExtras
 );
 
-router.get('/tesis/:id', tesisController.getTesisById);
+router.get('/tesis/:id', tesisController.getTesisById); 
 
-router.get('/tesis/user/:userId', tesisController.getTesisByUserId);
 
-router.get('/tesis/anexo11/:tesisId', tesisController.getAnexo11Documents);
-router.get('/tesis/anexo30/:tesisId', tesisController.getAnexo30Documents);
-router.get('/tesis/extras/:tesisId', tesisController.getExtrasDocuments);
+router.get('/tesis/user/:userId', tesisController.getTesisByUserId); // inicio
+router.get('/tesis/anexo11/:tesisId', tesisController.getAnexo11Documents); // anexo 11
+router.get('/tesis/anexo30/:tesisId', tesisController.getAnexo30Documents); // anexo 30
+router.get('/tesis/extras/:tesisId', tesisController.getExtrasDocuments); // extras
+
+
 router.get('/tesis/download/:tesisId/:fileKey', tesisController.downloadFile);
 
 router.get('/users/:userId/files', tesisController.getUserDocuments);

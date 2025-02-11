@@ -66,7 +66,8 @@ const login = async (req, res, next) => {
       "userId": user._id,
     }
     console.log("Token generado:", token);
-    res.status(200).json({ success: true, token, user: response });
+    const tesis = await Tesis.findOne({ userId: user._id });
+    res.status(200).json({ success: true, token, user: response, tesis });
   } catch (error) {
     console.error("Error en el login:", error);
     res.status(500).json({ success: false, error: error.message });
